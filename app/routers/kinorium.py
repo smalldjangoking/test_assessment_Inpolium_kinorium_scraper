@@ -12,7 +12,7 @@ async def kinorium_health_check():
     """Health check endpoint for external service https://ua.kinorium.com/"""
 
     try:
-        async with http_client.get("https://kinorium.com") as response:
+        async with http_client.get("https://ua.kinorium.com") as response:
             if response.status != 200:
                  # If status is not 200, log and return BAD status
                  logging.warning(f"External service returned {response.status}")
@@ -50,4 +50,15 @@ async def kinorium_via_http_client(
 ):
     """Uses the aiohttp HTTP client to fetch data from kinorium.com"""
 
-    return {"message": f"Welcome to the Kinorium service router. Genre: {genre.id}, Page: {page}, Per Page: {per_page}"}
+    async with http_client.get(
+        "https://ua.kinorium.com/R2D2/",
+        params={"genres[]": genre.id, 
+                "page": page, 
+                "per_page": per_page
+               }) as response:
+
+        html = await response.text()
+
+    return {"status": "OK", "data": html}
+
+
