@@ -62,3 +62,10 @@ async def kinorium_via_http_client(
     return {"status": "OK", "data": html}
 
 
+@router.post("/scraper/browser/headless", status_code=status.HTTP_200_OK)
+async def kinorium_via_browser_headless(movie_title: str):
+    """Uses Playwright to scrape data from kinorium.com in headless mode"""
+
+    
+
+
