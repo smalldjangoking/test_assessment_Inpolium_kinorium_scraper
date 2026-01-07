@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Query
 from app.core.http_client import http_client
 from fastapi.responses import JSONResponse
 import logging
+from schemas.http_scraper import PerPageLimit, Genre
 
 router = APIRouter(prefix="/v1/kinorium", tags=["kinorium service"])
 
@@ -39,3 +40,14 @@ async def kinorium_health_check():
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE
         )
+    
+
+@router.get("/scraper/http", status_code=status.HTTP_200_OK)
+async def kinorium_via_http_client(
+    genre: Genre = Query(default=Genre.FANTASY, description="Genre to filter by"),
+    page: int = Query(default=1, ge=1),
+    per_page: PerPageLimit = PerPageLimit.SMALL
+):
+    """Uses the aiohttp HTTP client to fetch data from kinorium.com"""
+
+    return {"message": f"Welcome to the Kinorium service router. Genre: {genre.id}, Page: {page}, Per Page: {per_page}"}
