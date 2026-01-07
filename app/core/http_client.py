@@ -7,7 +7,7 @@ class HTTPClient:
     def __init__(self):
         self._session: aiohttp.ClientSession | None = None
 
-    def start(self):
+    async def start(self):
         """Creates ClientSession for aiohttp for full project"""
         if self._session is not None:
             return

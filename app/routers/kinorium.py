@@ -2,7 +2,8 @@ from fastapi import APIRouter, status, Query
 from app.core.http_client import http_client
 from fastapi.responses import JSONResponse
 import logging
-from schemas.http_scraper import PerPageLimit, Genre
+from schemas.options import PerPageLimit, Genre
+from app.services.kinorium_playwright import KinoriumPlaywrightService
 
 router = APIRouter(prefix="/v1/kinorium", tags=["kinorium service"])
 
@@ -66,6 +67,12 @@ async def kinorium_via_http_client(
 async def kinorium_via_browser_headless(movie_title: str):
     """Uses Playwright to scrape data from kinorium.com in headless mode"""
 
+    kinorium = KinoriumPlaywrightService(headless=False, should_scrape=False)
+    result = await kinorium.movie_detail_executor(movie_title=movie_title)
+
+    if not result:
+        return {'status': 'error', 'message': 'No data found'}
     
+    return {'status': 'OK', 'data': result}
 
 
