@@ -1,11 +1,27 @@
 from fastapi import APIRouter, status, Query
-from app.core.http_client import http_client
 from fastapi.responses import JSONResponse
 import logging
-from schemas.options import PerPageLimit, Genre
+from app.schemas.options import PerPageLimit, Genre
 from app.services.kinorium_playwright import KinoriumPlaywrightService
+from app.services.kinorium_http import KinoriumHTTPService
+from app.schemas.movies import MovieDetail
+from app.core.http_client import http_client
 
 router = APIRouter(prefix="/v1/kinorium", tags=["kinorium service"])
+
+async def _run_kinorium_logic(movie_title: str, headless: bool, should_scrape: bool = True):
+    kinorium = KinoriumPlaywrightService(headless=headless, should_scrape=should_scrape)
+    result = await kinorium.movie_detail_executor(movie_title=movie_title)
+    
+    if not result:
+        return {'status': 'error', 'message': 'No data found'}
+    
+    if isinstance(result, str):
+        return {'status': 'OK', 'url': result}
+
+    
+    validated_result = MovieDetail(**result)
+    return {'status': 'OK', 'data': validated_result}
 
 
 @router.get("/health", status_code=status.HTTP_200_OK)
@@ -49,30 +65,46 @@ async def kinorium_via_http_client(
     page: int = Query(default=1, ge=1),
     per_page: PerPageLimit = PerPageLimit.SMALL
 ):
-    """Uses the aiohttp HTTP client to fetch data from kinorium.com"""
-
-    async with http_client.get(
-        "https://ua.kinorium.com/R2D2/",
-        params={"genres[]": genre.id, 
-                "page": page, 
-                "per_page": per_page
-               }) as response:
-
-        html = await response.text()
-
-    return {"status": "OK", "data": html}
-
-
-@router.post("/scraper/browser/headless", status_code=status.HTTP_200_OK)
-async def kinorium_via_browser_headless(movie_title: str):
-    """Uses Playwright to scrape data from kinorium.com in headless mode"""
-
-    kinorium = KinoriumPlaywrightService(headless=True, should_scrape=True)
-    result = await kinorium.movie_detail_executor(movie_title=movie_title)
-
-    if not result:
-        return {'status': 'error', 'message': 'No data found'}
+    """
+    1️⃣ Простий запит (без браузера)
+    Uses the aiohttp HTTP client to fetch data from kinorium by genre and pagination.
     
-    return {'status': 'OK', 'data': result}
+    """
+    result = await KinoriumHTTPService().start_scraper(genre.id, page, per_page)
 
+    return {"status": "OK", "data": result}
+
+
+@router.post("/scraper/browser/headless", 
+             status_code=status.HTTP_200_OK,
+             summary="Scrape movie details (headless)")
+async def kinorium_via_browser_headless(movie_title: str):
+    """
+    2️⃣ Headless-браузер (скрейпінг деталей фільму)
+    
+    Opens the browser in headless mode to scrape detailed movie information.
+
+    Returns: Scraped movie details as a structured dictionary (Pydantic Model).
+    """
+
+    await _run_kinorium_logic(movie_title=movie_title, headless=True, should_scrape=True)
+
+
+
+@router.post(
+        "/scraper/browser/debug", 
+        status_code=status.HTTP_200_OK,
+        summary="Scrape movie details (Debug/Visual)"
+        )
+async def kinorium_via_browser_debug(movie_title: str):
+    """
+    3️⃣ Браузер без headless (відкриття сторінки фільму)
+
+    Opens the browser in non-headless mode for debugging purposes.
+    
+    Returns: URL of the movie detail page.
+
+    """
+
+    await _run_kinorium_logic(movie_title=movie_title, headless=False, should_scrape=False)
 

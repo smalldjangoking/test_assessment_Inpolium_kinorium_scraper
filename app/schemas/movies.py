@@ -12,7 +12,7 @@ class RoleGroup(BaseModel):
     role: str
     people: list[Person]
 
-class MovieDetailResponse(BaseModel):
+class MovieDetail(BaseModel):
     url: str
     title: str
     description: str

@@ -90,7 +90,7 @@ class KinoriumPlaywrightService:
             return None
         
         await movie_locator.locator(".search-page__title-link").click()
-        await page.wait_for_load_state("load")
+        await page.wait_for_load_state("load", timeout=1000)
         return page
     
     async def _scrape_movie_details(self, page) -> dict:
@@ -136,15 +136,15 @@ class KinoriumPlaywrightService:
         count_ratings = await ratings_elements.count()
 
         # -- Scraping data --
-        title = await page.locator(".film-page__title-text").inner_text(),
-        description = await page.locator('section[itemprop="description"]').inner_text(),
-        year = await page.locator('.film-page__date a').inner_text(),
-        country = await page.locator('.film-page__country-link').inner_text(),
-        duration = await page.locator('.infotable tbody tr').nth(2).locator('td.data').inner_text(),
-        budget = await page.locator('.box-budget-tooltip').inner_text(),
-        poster = await page.locator('.movie_gallery_poster').get_attribute('src'),
-        logline = await page.locator('.film-page__slogan span').nth(1).text_content(),
-        production_companies = [await production_companies.nth(i).inner_text() for i in range(count_production_companies)],
+        title = await page.locator(".film-page__title-text").inner_text()
+        description = await page.locator('section[itemprop="description"]').inner_text()
+        year = await page.locator('.film-page__date a').inner_text()
+        country = await page.locator('.film-page__country-link').inner_text()
+        duration = await page.locator('.infotable tbody tr').nth(2).locator('td.data').inner_text()
+        budget = await page.locator('.box-budget-tooltip').inner_text()
+        poster = await page.locator('.movie_gallery_poster').get_attribute('src')
+        logline = await page.locator('.film-page__slogan span').nth(1).text_content()
+        production_companies = [await production_companies.nth(i).inner_text() for i in range(count_production_companies)]
         genres = [await genres.nth(i).text_content() for i in range(count_genres)]
 
         # -- Getting ratings of the movie --
@@ -158,6 +158,7 @@ class KinoriumPlaywrightService:
 
         # -- Getting crew information --
         await page.locator('h2.headlines-slide_crew a[href*="/cast/"]').first.click()
+        await page.wait_for_load_state("load", timeout=10000)
         crew_table = page.locator('.personList > div')
         count_crew_table = await crew_table.count()
 
