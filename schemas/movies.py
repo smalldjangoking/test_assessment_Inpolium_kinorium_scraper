@@ -1,14 +1,16 @@
 from pydantic import BaseModel
 
 class PlatformRating(BaseModel):
-    kinorium: float
-    imdb: float
-    critics: int
+    platform: str
+    rating: str
 
-class Actor(BaseModel):
+class Person(BaseModel):
     name: str
+    image: str | None = None
+
+class RoleGroup(BaseModel):
     role: str
-    image: str
+    people: list[Person]
 
 class MovieDetailResponse(BaseModel):
     url: str
@@ -16,12 +18,12 @@ class MovieDetailResponse(BaseModel):
     description: str
     year: int
     country: str
-    genres: list[str]
     duration: str
     budget: str
-    age_restriction: str
-    production_companies: list[str]
-    logline: str
-    actors: list[Actor]
-    rating: PlatformRating
     poster: str
+    age_restriction: str
+    logline: str
+    production_companies: list[str]
+    genres: list[str]
+    ratings: list[PlatformRating]
+    crew: list[RoleGroup]

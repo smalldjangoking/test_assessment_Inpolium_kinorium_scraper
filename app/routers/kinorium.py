@@ -67,7 +67,7 @@ async def kinorium_via_http_client(
 async def kinorium_via_browser_headless(movie_title: str):
     """Uses Playwright to scrape data from kinorium.com in headless mode"""
 
-    kinorium = KinoriumPlaywrightService(headless=False, should_scrape=False)
+    kinorium = KinoriumPlaywrightService(headless=True, should_scrape=True)
     result = await kinorium.movie_detail_executor(movie_title=movie_title)
 
     if not result:
