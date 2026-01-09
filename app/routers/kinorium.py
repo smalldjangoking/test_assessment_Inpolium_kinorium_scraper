@@ -87,7 +87,8 @@ async def kinorium_via_browser_headless(movie_title: str):
     Returns: Scraped movie details as a structured dictionary (Pydantic Model).
     """
 
-    await _run_kinorium_logic(movie_title=movie_title, headless=True, should_scrape=True)
+    return await _run_kinorium_logic(movie_title=movie_title, headless=True, should_scrape=True)
+
 
 
 
@@ -106,5 +107,5 @@ async def kinorium_via_browser_debug(movie_title: str):
 
     """
 
-    await _run_kinorium_logic(movie_title=movie_title, headless=False, should_scrape=False)
+    return await _run_kinorium_logic(movie_title=movie_title, headless=False, should_scrape=False)
 

@@ -135,17 +135,22 @@ class KinoriumPlaywrightService:
         ratings_elements = ratings_container.locator('li')
         count_ratings = await ratings_elements.count()
 
+        country = page.locator('a[itemprop="countryOfOrigin"]')
+        count_country = await country.count()
+
         # -- Scraping data --
+        page_detail_url = page.url
         title = await page.locator(".film-page__title-text").inner_text()
         description = await page.locator('section[itemprop="description"]').inner_text()
         year = await page.locator('.film-page__date a').inner_text()
-        country = await page.locator('.film-page__country-link').inner_text()
         duration = await page.locator('.infotable tbody tr').nth(2).locator('td.data').inner_text()
         budget = await page.locator('.box-budget-tooltip').inner_text()
         poster = await page.locator('.movie_gallery_poster').get_attribute('src')
+        poster = poster.split('?')[0]
         logline = await page.locator('.film-page__slogan span').nth(1).text_content()
         production_companies = [await production_companies.nth(i).inner_text() for i in range(count_production_companies)]
         genres = [await genres.nth(i).text_content() for i in range(count_genres)]
+        country = [await country.nth(i).inner_text() for i in range(count_country)]
 
         # -- Getting ratings of the movie --
         ratings_list = [] #list of platform ratings
@@ -157,8 +162,9 @@ class KinoriumPlaywrightService:
 
 
         # -- Getting crew information --
-        await page.locator('h2.headlines-slide_crew a[href*="/cast/"]').first.click()
+        await page.locator('h2.headlines-slide_crew a[href*="/cast/"]').first.click() #goes to /cast/ page of movie
         await page.wait_for_load_state("load", timeout=10000)
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         crew_table = page.locator('.personList > div')
         count_crew_table = await crew_table.count()
 
@@ -174,7 +180,11 @@ class KinoriumPlaywrightService:
                 person_table = role_crew.nth(r)
 
                 name = await person_table.locator('.cast-page__item-name').inner_text()
-                image = await person_table.get_by_role("img").first.get_attribute('src')
+                #Image
+                img_element = person_table.locator('img.cast-page__item-img_person, img.cast-page__item-img').first
+                image = await img_element.get_attribute('src')
+                if not image:
+                    image = await person_table.locator('link[itemprop="image"]').get_attribute('content')
                 clear_image_url = image.split('?')[0] if image else None
 
                 person_dict = {
@@ -189,7 +199,7 @@ class KinoriumPlaywrightService:
             })
 
         return {
-        'url': page.url,
+        'url': page_detail_url,
         'title': title,
         'description': description,
         'year': year,

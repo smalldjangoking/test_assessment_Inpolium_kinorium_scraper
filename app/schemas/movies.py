@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 class PlatformRating(BaseModel):
     platform: str
@@ -7,6 +7,10 @@ class PlatformRating(BaseModel):
 class Person(BaseModel):
     name: str
     image: str | None = None
+
+    @field_validator('name', mode='after')
+    def clean_name(cls, v: str) -> str:
+        return v.strip()
 
 class RoleGroup(BaseModel):
     role: str
@@ -17,7 +21,7 @@ class MovieDetail(BaseModel):
     title: str
     description: str
     year: int
-    country: str
+    country: list[str]
     duration: str
     budget: str
     poster: str
@@ -27,3 +31,7 @@ class MovieDetail(BaseModel):
     genres: list[str]
     ratings: list[PlatformRating]
     crew: list[RoleGroup]
+
+    @field_validator('logline', mode='after')
+    def clean_logline(cls, v: str) -> str:
+        return v.replace("»", "").replace("«", "").strip()
