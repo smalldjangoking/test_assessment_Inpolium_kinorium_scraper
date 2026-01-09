@@ -1,6 +1,6 @@
 # 🎬 Kinorium Scraper
 
-A robust data collection system for scraping content from [ua.kinorium.com](https://ua.kinorium.com). Built with modern Python tools including FastAPI, Playwright, Pydantic, and aiohttp.
+A robust data collection system for scraping content from [ua.kinorium.com](https://ua.kinorium.com). Built with modern Python tools including FastAPI, Playwright, Pydantic, beautifulsoup4 and aiohttp.
 
 ## ⚠️ Important Notes
 
@@ -81,6 +81,7 @@ Once running, open your browser and navigate to the URL shown in the terminal (t
 - **Playwright** - Browser automation for dynamic content
 - **Pydantic** - Data validation and serialization
 - **aiohttp** - Asynchronous HTTP client
+- **beautifulsoup4** - HTML parsing and extraction
 ---
 
 **Note**: Please use this scraper responsibly and in accordance with the website's terms of service.
