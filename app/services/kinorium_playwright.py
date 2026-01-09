@@ -109,7 +109,7 @@ class KinoriumPlaywrightService:
                         - title (str): Movie title.
                         - description (str): Plot summary.
                         - year (str): Release year.
-                        - country (str): Country of origin.
+                        - country (list[str]): Country of origin.
                         - duration (str): Runtime.
                         - budget (str): Financial info.
                         - poster (str): URL to the movie poster.

@@ -9,7 +9,20 @@ from app.core.http_client import http_client
 
 router = APIRouter(prefix="/v1/kinorium", tags=["kinorium service"])
 
-async def _run_kinorium_logic(movie_title: str, headless: bool, should_scrape: bool = True):
+async def _run_kinorium_logic(movie_title: str, headless: bool, should_scrape: bool = True) -> dict:
+    """
+    Handler for Playwright endpoints. KinoriumPlaywrightService Controller.
+    
+    Args:
+        movie_title (str): Accepts movie title for search
+        headless (bool): True == Headless (Hidden), False == Non-headless (Visible)
+        should_scrape (bool): Toggle to enable (True) or disable (False) detail scraping.
+
+    Returns:
+        dict[str, Any]: A dictionary containing the execution status and either 
+                         the scraped data, a URL, or an error message.
+    """
+
     kinorium = KinoriumPlaywrightService(headless=headless, should_scrape=should_scrape)
     result = await kinorium.movie_detail_executor(movie_title=movie_title)
     
@@ -19,7 +32,6 @@ async def _run_kinorium_logic(movie_title: str, headless: bool, should_scrape: b
     if isinstance(result, str):
         return {'status': 'OK', 'url': result}
 
-    
     validated_result = MovieDetail(**result)
     return {'status': 'OK', 'data': validated_result}
 
@@ -68,7 +80,6 @@ async def kinorium_via_http_client(
     """
     1️⃣ Простий запит (без браузера)
     Uses the aiohttp HTTP client to fetch data from kinorium by genre and pagination.
-    
     """
     result = await KinoriumHTTPService().start_scraper(genre.id, page, per_page)
 
