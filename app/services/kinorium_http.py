@@ -1,6 +1,15 @@
 from app.core.http_client import http_client
 from bs4 import BeautifulSoup
 import logging
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SESSION=os.getenv("SESSION", "1u2j4mf7a3i0i3d9h83rfb8a44")
+X119=os.getenv("X119", "88513")
+PHPSESSID=os.getenv("PHPSESSID", "pj95efe3eommbikt25idka2osn")
+USER_AGENT=os.getenv("USER_AGENT", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0")
 
 
 class KinoriumHTTPService:
@@ -113,14 +122,14 @@ class KinoriumHTTPService:
 
         #(обязательно проверь актуальность 'session')
         cookies = {
-            "session": "1u2j4mf7a3i0i3d9h83rfb8a44",
-            "x119": "88513",
-            "PHPSESSID": "pj95efe3eommbikt25idka2osn"
+            "session": SESSION,
+            "x119": X119,
+            "PHPSESSID": PHPSESSID
         }
 
         # 3. Заголовки, чтобы запрос выглядел как от твоего браузера
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0",
+            "User-Agent": USER_AGENT,
             "X-Requested-With": "XMLHttpRequest",
             "Referer": "https://ua.kinorium.com/R2D2/"
         }
